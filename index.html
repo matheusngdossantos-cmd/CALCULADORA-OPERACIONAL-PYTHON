@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Calculadora Pro - Moderna & Responsiva</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      --calc-bg: rgba(30, 41, 59, 0.82);
+      --calc-border: rgba(255, 255, 255, 0.1);
+      --calc-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      --screen-bg: rgba(15, 23, 42, 0.75);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --btn-num-bg: rgba(51, 65, 85, 0.6);
+      --btn-num-hover: rgba(71, 85, 105, 0.9);
+      --btn-num-active: rgba(100, 116, 139, 1);
+      --btn-fn-bg: rgba(59, 130, 246, 0.15);
+      --btn-fn-color: #60a5fa;
+      --btn-fn-hover: rgba(59, 130, 246, 0.28);
+      --btn-op-bg: #3b82f6;
+      --btn-op-hover: #2563eb;
+      --btn-op-color: #ffffff;
+      --btn-eq-bg: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      --btn-eq-hover: linear-gradient(135deg, #059669 0%, #047857 100%);
+      --btn-del-color: #f43f5e;
+      --badge-bg: rgba(59, 130, 246, 0.2);
+      --badge-text: #93c5fd;
+    }
+
+    .light-theme {
+      --bg-gradient: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+      --calc-bg: rgba(255, 255, 255, 0.88);
+      --calc-border: rgba(0, 0, 0, 0.08);
+      --calc-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+      --screen-bg: rgba(241, 245, 249, 0.95);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --btn-num-bg: #f8fafc;
+      --btn-num-hover: #e2e8f0;
+      --btn-num-active: #cbd5e1;
+      --btn-fn-bg: rgba(59, 130, 246, 0.1);
+      --btn-fn-color: #2563eb;
+      --btn-fn-hover: rgba(59, 130, 246, 0.2);
+      --btn-op-bg: #2563eb;
+      --btn-op-hover: #1d4ed8;
+      --btn-op-color: #ffffff;
+      --btn-eq-bg: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      --btn-eq-hover: linear-gradient(135deg, #059669 0%, #047857 100%);
+      --btn-del-color: #e11d48;
+      --badge-bg: rgba(37, 99, 235, 0.1);
+      --badge-text: #1d4ed8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-gradient);
+      padding: 16px;
+      transition: background 0.3s ease;
+      color: var(--text-main);
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
+    }
+
+    .app-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-title span.badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .theme-toggle-btn {
+      background: var(--calc-bg);
+      border: 1px solid var(--calc-border);
+      color: var(--text-main);
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .theme-toggle-btn:hover {
+      transform: scale(1.05);
+    }
+
+    /* Card da Calculadora */
+    .calculator-card {
+      background: var(--calc-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--calc-border);
+      box-shadow: var(--calc-shadow);
+      border-radius: 28px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.3s ease;
+    }
+
+    /* Visor */
+    .screen {
+      background: var(--screen-bg);
+      border: 1px solid var(--calc-border);
+      border-radius: 20px;
+      padding: 16px 20px;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      min-height: 108px;
+      overflow: hidden;
+    }
+
+    .screen-history {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      min-height: 22px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+    .screen-history::-webkit-scrollbar { display: none; }
+
+    .screen-current {
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+      line-height: 1.2;
+    }
+    .screen-current::-webkit-scrollbar { display: none; }
+
+    /* Barra de Ações Rápidas de Porcentagem */
+    .quick-perc-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .btn-quick {
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 7px 4px;
+      border-radius: 10px;
+      border: 1px solid var(--calc-border);
+      background: var(--btn-fn-bg);
+      color: var(--btn-fn-color);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .btn-quick:hover {
+      background: var(--btn-fn-hover);
+      transform: translateY(-1px);
+    }
+    .btn-quick:active {
+      transform: scale(0.96);
+    }
+
+    /* Teclado Grid */
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    button.key {
+      position: relative;
+      border: 1px solid transparent;
+      outline: none;
+      border-radius: 16px;
+      font-size: 1.25rem;
+      font-weight: 600;
+      height: 62px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    button.key:active {
+      transform: scale(0.94);
+    }
+
+    /* Estilos específicos de teclas */
+    .key-number {
+      background: var(--btn-num-bg);
+      color: var(--text-main);
+      border-color: var(--calc-border);
+    }
+    .key-number:hover {
+      background: var(--btn-num-hover);
+    }
+
+    .key-fn {
+      background: var(--btn-fn-bg);
+      color: var(--btn-fn-color);
+      font-size: 1.05rem;
+    }
+    .key-fn:hover {
+      background: var(--btn-fn-hover);
+    }
+
+    .key-del {
+      color: var(--btn-del-color);
+    }
+
+    .key-op {
+      background: var(--btn-op-bg);
+      color: var(--btn-op-color);
+      font-size: 1.35rem;
+    }
+    .key-op:hover {
+      background: var(--btn-op-hover);
+    }
+
+    .key-equals {
+      background: var(--btn-eq-bg);
+      color: #ffffff;
+      font-size: 1.4rem;
+      grid-column: span 1;
+    }
+    .key-equals:hover {
+      background: var(--btn-eq-hover);
+    }
+
+    /* Histórico Expansível */
+    .history-drawer {
+      margin-top: 4px;
+      background: var(--screen-bg);
+      border: 1px solid var(--calc-border);
+      border-radius: 16px;
+      padding: 12px;
+      max-height: 140px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 6px;
+      font-size: 0.85rem;
+    }
+    .history-drawer::-webkit-scrollbar {
+      width: 4px;
+    }
+    .history-drawer::-webkit-scrollbar-thumb {
+      background: var(--text-muted);
+      border-radius: 4px;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+    .history-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+    }
+    .history-item strong {
+      color: var(--text-main);
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      padding: 0 4px;
+    }
+
+    .clear-history-btn {
+      background: none;
+      border: none;
+      color: var(--btn-del-color);
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* Responsividade em telas ultra-pequenas */
+    @media (max-width: 380px) {
+      body {
+        padding: 8px;
+      }
+      .calculator-card {
+        padding: 14px;
+        border-radius: 22px;
+        gap: 12px;
+      }
+      button.key {
+        height: 52px;
+        font-size: 1.1rem;
+        border-radius: 12px;
+      }
+      .screen-current {
+        font-size: 2.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Barra Superior -->
+    <div class="top-bar">
+      <div class="app-title">
+        <span>Calculadora Modular</span>
+        <span class="badge">Pro</span>
+      </div>
+      <button class="theme-toggle-btn" id="themeBtn" title="Alternar Tema Claro/Escuro" aria-label="Alternar Tema">
+        <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Calculadora Card -->
+    <div class="calculator-card">
+      <!-- Visor -->
+      <div class="screen" aria-live="polite">
+        <div class="screen-history" id="historyDisplay"></div>
+        <div class="screen-current" id="currentDisplay">0</div>
+      </div>
+
+      <!-- Barra de Ações Rápidas de Porcentagem -->
+      <div class="quick-perc-bar">
+        <button class="btn-quick" onclick="calcQuickPercent('taxa')" title="Calcula X% de um valor">
+          <span>% Taxa</span>
+        </button>
+        <button class="btn-quick" onclick="calcQuickPercent('acrescimo')" title="Adiciona taxa % ao valor">
+          <span>+ % Acréscimo</span>
+        </button>
+        <button class="btn-quick" onclick="calcQuickPercent('desconto')" title="Subtrai desconto % do valor">
+          <span>- % Desconto</span>
+        </button>
+      </div>
+
+      <!-- Teclado Responsivo -->
+      <div class="keypad">
+        <button class="key key-fn key-del" onclick="clearAll()">AC</button>
+        <button class="key key-fn" onclick="deleteDigit()">⌫</button>
+        <button class="key key-fn" onclick="appendOperator('%')">%</button>
+        <button class="key key-op" onclick="appendOperator('/')">÷</button>
+
+        <button class="key key-number" onclick="appendNumber('7')">7</button>
+        <button class="key key-number" onclick="appendNumber('8')">8</button>
+        <button class="key key-number" onclick="appendNumber('9')">9</button>
+        <button class="key key-op" onclick="appendOperator('*')">×</button>
+
+        <button class="key key-number" onclick="appendNumber('4')">4</button>
+        <button class="key key-number" onclick="appendNumber('5')">5</button>
+        <button class="key key-number" onclick="appendNumber('6')">6</button>
+        <button class="key key-op" onclick="appendOperator('-')">−</button>
+
+        <button class="key key-number" onclick="appendNumber('1')">1</button>
+        <button class="key key-number" onclick="appendNumber('2')">2</button>
+        <button class="key key-number" onclick="appendNumber('3')">3</button>
+        <button class="key key-op" onclick="appendOperator('+')">+</button>
+
+        <button class="key key-fn" onclick="toggleSign()">±</button>
+        <button class="key key-number" onclick="appendNumber('0')">0</button>
+        <button class="key key-number" onclick="appendDecimal()">.</button>
+        <button class="key key-equals" onclick="computeResult()">=</button>
+      </div>
+
+      <!-- Histórico -->
+      <div>
+        <div class="history-header">
+          <span>Histórico</span>
+          <button class="clear-history-btn" onclick="clearHistoryList()">Limpar</button>
+        </div>
+        <div class="history-drawer" id="historyList">
+          <div style="color: var(--text-muted); font-size: 0.8rem; text-align: center; width: 100%; padding: 8px 0;">
+            Nenhum cálculo recente
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // ESTADO E LÓGICA MATEMÁTICA MODULAR
+    // ==========================================
+    let currentInput = "0";
+    let previousInput = "";
+    let operation = null;
+    let shouldResetDisplay = false;
+    let history = [];
+
+    const currentDisplay = document.getElementById("currentDisplay");
+    const historyDisplay = document.getElementById("historyDisplay");
+    const historyList = document.getElementById("historyList");
+
+    // Funções matemáticas puras (conforme especificações modulares)
+    const somar = (a, b) => a + b;
+    const subtrair = (a, b) => a - b;
+    const multiplicar = (a, b) => a * b;
+    const dividir = (a, b) => (b === 0 ? null : a / b);
+    const porcentagem = (valor, taxa) => (valor * taxa) / 100;
+
+    function formatNumber(num) {
+      if (num === null || isNaN(num) || !isFinite(num)) return "Erro";
+      // Arredonda para até 8 casas decimais sem zeros à direita desnecessários
+      const fixed = Number(Math.round(num + "e+8") + "e-8");
+      return fixed.toString();
+    }
+
+    function updateDisplay() {
+      currentDisplay.innerText = currentInput;
+      if (operation !== null) {
+        const symbol = getOpSymbol(operation);
+        historyDisplay.innerText = `${previousInput} ${symbol}`;
+      } else {
+        historyDisplay.innerText = "";
+      }
+    }
+
+    function getOpSymbol(op) {
+      switch (op) {
+        case "+": return "+";
+        case "-": return "−";
+        case "*": return "×";
+        case "/": return "÷";
+        case "%": return "%";
+        default: return "";
+      }
+    }
+
+    function appendNumber(numStr) {
+      if (shouldResetDisplay) {
+        currentInput = numStr;
+        shouldResetDisplay = false;
+      } else {
+        if (currentInput === "0") {
+          currentInput = numStr;
+        } else {
+          if (currentInput.length < 15) {
+            currentInput += numStr;
+          }
+        }
+      }
+      updateDisplay();
+    }
+
+    function appendDecimal() {
+      if (shouldResetDisplay) {
+        currentInput = "0.";
+        shouldResetDisplay = false;
+      } else if (!currentInput.includes(".")) {
+        currentInput += ".";
+      }
+      updateDisplay();
+    }
+
+    function toggleSign() {
+      if (currentInput === "0" || currentInput === "Erro") return;
+      if (currentInput.startsWith("-")) {
+        currentInput = currentInput.slice(1);
+      } else {
+        currentInput = "-" + currentInput;
+      }
+      updateDisplay();
+    }
+
+    function deleteDigit() {
+      if (shouldResetDisplay || currentInput === "Erro") {
+        clearAll();
+        return;
+      }
+      if (currentInput.length === 1 || (currentInput.length === 2 && currentInput.startsWith("-"))) {
+        currentInput = "0";
+      } else {
+        currentInput = currentInput.slice(0, -1);
+      }
+      updateDisplay();
+    }
+
+    function clearAll() {
+      currentInput = "0";
+      previousInput = "";
+      operation = null;
+      shouldResetDisplay = false;
+      updateDisplay();
+    }
+
+    function appendOperator(op) {
+      if (currentInput === "Erro") return;
+
+      if (operation !== null && !shouldResetDisplay) {
+        computeResult();
+      }
+
+      previousInput = currentInput;
+      operation = op;
+      shouldResetDisplay = true;
+      updateDisplay();
+    }
+
+    function computeResult() {
+      if (operation === null || shouldResetDisplay) return;
+
+      const a = parseFloat(previousInput);
+      const b = parseFloat(currentInput);
+      let result = null;
+
+      switch (operation) {
+        case "+":
+          result = somar(a, b);
+          break;
+        case "-":
+          result = subtrair(a, b);
+          break;
+        case "*":
+          result = multiplicar(a, b);
+          break;
+        case "/":
+          result = dividir(a, b);
+          break;
+        case "%":
+          result = porcentagem(a, b);
+          break;
+      }
+
+      const opSymbol = getOpSymbol(operation);
+      if (result === null) {
+        currentInput = "Erro";
+        historyDisplay.innerText = `${a} ${opSymbol} ${b} =`;
+      } else {
+        const formatted = formatNumber(result);
+        addHistoryItem(`${a} ${opSymbol} ${b}`, formatted);
+        historyDisplay.innerText = `${a} ${opSymbol} ${b} =`;
+        currentInput = formatted;
+      }
+
+      operation = null;
+      shouldResetDisplay = true;
+      currentDisplay.innerText = currentInput;
+    }
+
+    // Ações Rápidas de Porcentagem
+    function calcQuickPercent(type) {
+      const val = parseFloat(currentInput);
+      if (isNaN(val)) return;
+
+      if (previousInput && operation) {
+        // Se já havia um valor base e operador
+        const base = parseFloat(previousInput);
+        const taxa = val;
+        const parcel = porcentagem(base, taxa);
+        
+        if (type === "taxa") {
+          currentInput = formatNumber(parcel);
+        } else if (type === "acrescimo") {
+          currentInput = formatNumber(base + parcel);
+          operation = null;
+        } else if (type === "desconto") {
+          currentInput = formatNumber(base - parcel);
+          operation = null;
+        }
+      } else {
+        // Aplicação direta sobre o número atual
+        if (type === "taxa") {
+          currentInput = formatNumber(val / 100);
+        } else {
+          const taxa = prompt("Digite a taxa percentual (%):", "10");
+          if (taxa !== null) {
+            const p = parseFloat(taxa);
+            if (!isNaN(p)) {
+              const res = type === "acrescimo" ? val + (val * p) / 100 : val - (val * p) / 100;
+              const desc = type === "acrescimo" ? `+${p}% de ${val}` : `-${p}% de ${val}`;
+              addHistoryItem(desc, formatNumber(res));
+              currentInput = formatNumber(res);
+            }
+          }
+        }
+      }
+      shouldResetDisplay = true;
+      updateDisplay();
+    }
+
+    // Histórico
+    function addHistoryItem(expr, result) {
+      history.unshift({ expr, result });
+      renderHistory();
+    }
+
+    function renderHistory() {
+      if (history.length === 0) {
+        historyList.innerHTML = `
+          <div style="color: var(--text-muted); font-size: 0.8rem; text-align: center; width: 100%; padding: 8px 0;">
+            Nenhum cálculo recente
+          </div>`;
+        return;
+      }
+
+      historyList.innerHTML = history.slice(0, 8).map(item => `
+        <div class="history-item" onclick="loadFromHistory('${item.result}')">
+          <span>${item.expr} =</span>
+          <strong>${item.result}</strong>
+        </div>
+      `).join("");
+    }
+
+    function loadFromHistory(val) {
+      currentInput = val;
+      shouldResetDisplay = true;
+      updateDisplay();
+    }
+
+    function clearHistoryList() {
+      history = [];
+      renderHistory();
+    }
+
+    // Alternar Tema (Dark / Light)
+    const themeBtn = document.getElementById("themeBtn");
+    const themeIcon = document.getElementById("themeIcon");
+    let isLight = false;
+
+    themeBtn.addEventListener("click", () => {
+      isLight = !isLight;
+      document.body.classList.toggle("light-theme", isLight);
+      
+      if (isLight) {
+        // Ícone da Lua
+        themeIcon.innerHTML = `
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        `;
+      } else {
+        // Ícone do Sol
+        themeIcon.innerHTML = `
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        `;
+      }
+    });
+
+    // Suporte Completo ao Teclado Físico
+    window.addEventListener("keydown", (e) => {
+      if ((e.key >= "0" && e.key <= "9")) {
+        appendNumber(e.key);
+      } else if (e.key === "." || e.key === ",") {
+        appendDecimal();
+      } else if (e.key === "+" || e.key === "-" || e.key === "*" || e.key === "/") {
+        appendOperator(e.key);
+      } else if (e.key === "%") {
+        appendOperator("%");
+      } else if (e.key === "Enter" || e.key === "=") {
+        e.preventDefault();
+        computeResult();
+      } else if (e.key === "Backspace") {
+        deleteDigit();
+      } else if (e.key === "Escape") {
+        clearAll();
+      }
+    });
+  </script>
+</body>
+</html>
